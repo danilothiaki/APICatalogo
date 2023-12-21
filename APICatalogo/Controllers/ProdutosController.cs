@@ -20,62 +20,98 @@ namespace APICatalogo.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Produto>> GetProdutos()
         {
-            var produtos = _context.Produtos.ToList();
+            try
+            {
+                var produtos = _context.Produtos.AsNoTracking().ToList();
 
-            if (produtos == null)
-                return NotFound("Produtos não encontrados");
+                if (produtos == null)
+                    return NotFound("Produtos não encontrados");
 
 
-            return produtos;
+                return produtos;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro");
+            }
+            
         }
 
         [HttpGet("{id:int}", Name = "ConsultarProduto")]
         public ActionResult<Produto> GetProduto(int id)
         {
-            var produto = _context.Produtos.Where(a => a.ProdutoId == id).FirstOrDefault();
+            try
+            {
+                var produto = _context.Produtos.Where(a => a.ProdutoId == id).AsNoTracking().FirstOrDefault();
 
-            if (produto == null)
-                return NotFound("Produtos não encontrados");
+                if (produto == null)
+                    return NotFound("Produtos não encontrados");
 
-            return produto;
+                return produto;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro");
+            }
         }
 
         [HttpPost]
         public ActionResult PostProduto([FromBody] Produto produto)
         {
-            if (produto == null)
-                return BadRequest();
+            try
+            {
+                if (produto == null)
+                    return BadRequest();
 
-            _context.Produtos.Add(produto);
-            _context.SaveChanges();
+                _context.Produtos.Add(produto);
+                _context.SaveChanges();
 
-            return new CreatedAtRouteResult("ConsultarProduto", new { id = produto.ProdutoId }, produto);
+                return new CreatedAtRouteResult("ConsultarProduto", new { id = produto.ProdutoId }, produto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro");
+            }
         }
 
         [HttpPut("{id:int}")]
         public ActionResult PutProduto(int id, Produto produto)
         {
-            if (id != produto.ProdutoId)
-                return BadRequest();
+            try
+            {
+                if (id != produto.ProdutoId)
+                    return BadRequest();
 
-            _context.Entry(produto).State = EntityState.Modified;
-            _context.SaveChanges();
+                _context.Entry(produto).State = EntityState.Modified;
+                _context.SaveChanges();
 
-            return Ok(produto);
+                return Ok(produto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro");
+            }
         }
 
         [HttpDelete("{id:int}")]
         public ActionResult DeleteProduto(int id)
         {
-            var produto = _context.Produtos.FirstOrDefault(a => a.ProdutoId == id);
+            try
+            {
+                var produto = _context.Produtos.FirstOrDefault(a => a.ProdutoId == id);
 
-            _context.Produtos.Remove(produto);
-            _context.SaveChanges();
+                _context.Produtos.Remove(produto);
+                _context.SaveChanges();
 
-            if (produto == null) 
-                return NotFound("Produto não encontrado");
+                if (produto == null)
+                    return NotFound("Produto não encontrado");
 
-            return Ok(produto);
+                return Ok(produto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro");
+            }
         }
     }
 }
